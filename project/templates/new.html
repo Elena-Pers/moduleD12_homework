@@ -1,5 +1,6 @@
 
 {% extends 'flatpages/default.html' %}
+{% load custom_filters %}
 
 {% block title %}
 News
@@ -8,9 +9,9 @@ News
 {% block content %}
 
     {% if new %}
-       <h2>{{ new.name}}</h2>
+       <h2>{{ new.name|censor}}</h2>
        <h2>{{ new.creationTime.day}}-{{ new.creationTime.month}}-{{new.creationTime.year}} {{ new.creationTime.hour}}:{{ new.creationTime.minute}}</h2>
-       <p>{{ new.description}}</p>
+       <p>{{ new.description|censor}}</p>
 
 
 
