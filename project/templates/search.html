@@ -1,0 +1,55 @@
+{% extends 'flatpages/default.html' %}
+
+{% load custom_filters %}
+
+{% block title %}
+Search
+{% endblock title %}
+
+
+
+{% block content %}
+<!-- Перед таблицей добавим форму для поиска -->
+<form method="GET">
+    {{ filter.form }} <!-- Форму от фильтров за нас сделает Django. А вот кнопку, увы, придётся делать самому -->
+    <input type="submit" value="Найти">
+</form>
+
+            <table>
+            <tr>
+                <td>
+                    <h2>Заголовок</h2>
+                </td>
+                <td>
+                    <h2>Дата</h2>
+                </td>
+                <td>
+                    <h2>Текст</h2>
+                </td>
+                <td>
+                    <h2>Автор</h2>
+                </td>
+
+            </tr>
+         {% for new in filter.qs %} <!-- поменяем news на filter.qs, т.к. теперь мы забираем уже отобранную по каким-то параметрам информацию -->
+            <tr>
+                <td>
+                    {{ new.name|censor }}
+                </td>
+                <td>
+		        {{ new.creationTime}}
+                </td>
+                <td>
+                    {{ new.description|truncatechars:50|censor }}
+                </td>
+                <td>
+                    {{new.authorNew}}
+                </td>
+            </tr>
+        {% endfor %}
+        </table>
+
+
+{% endblock content %}
+
+

@@ -13,9 +13,6 @@ News
        <h2>{{ new.creationTime.day}}-{{ new.creationTime.month}}-{{new.creationTime.year}} {{ new.creationTime.hour}}:{{ new.creationTime.minute}}</h2>
        <p>{{ new.description|censor}}</p>
 
-
-
-
     {% else %}
         <h2>Новостей нет!</h2>
     {% endif %}

@@ -47,7 +47,7 @@ class NewsSearch(ListView):
     template_name = 'search.html'  # указываем имя шаблона, в котором будет лежать HTML, в нём будут все инструкции о том, как именно пользователю должны вывестись наши объекты
     context_object_name = 'newsSearch'
     queryset = News.objects.order_by('-creationTime')
-    paginate_by = 1
+    #paginate_by = 1
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -75,6 +75,7 @@ class NewsUpdateView(UpdateView):
 class NewsDeleteView(DeleteView):
     template_name = 'delete.html'
     queryset = News.objects.all()
+    context_object_name = 'new'
     success_url = '/news/'
 
 
