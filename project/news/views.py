@@ -1,11 +1,17 @@
-from django.shortcuts import render
+
  # импортируем класс, который говорит нам о том, что в этом представлении мы будем выводить список объектов из БД
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, View
 from .models import News
 from datetime import datetime
 from .filters import NewsFilter # импортируем недавно написанный фильтр
 from .forms import NewsForm
-from django.core.paginator import Paginator
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import redirect
+from django.contrib.auth.models import Group
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.views.generic.edit import CreateView
+
 
 
 class NewsList(ListView):
@@ -55,13 +61,17 @@ class NewsSearch(ListView):
         queryset=self.get_queryset())  # вписываем наш фильтр в контекст
         return context
 
-class NewsCreate(CreateView):
+class NewsCreate(PermissionRequiredMixin, CreateView):
+        permission_required = ('news.add_news',)
         template_name = 'create.html'
         form_class = NewsForm
 
 
+
+
 # дженерик для редактирования объекта
-class NewsUpdateView(UpdateView):
+class NewsUpdateView(PermissionRequiredMixin, UpdateView, LoginRequiredMixin):
+    permission_required = ('news.change_news',)
     template_name = 'create.html'
     form_class = NewsForm
 
@@ -69,6 +79,7 @@ class NewsUpdateView(UpdateView):
     def get_object(self, **kwargs):
         id = self.kwargs.get('pk')
         return News.objects.get(pk=id)
+
 
 
 # дженерик для удаления товара
@@ -79,5 +90,11 @@ class NewsDeleteView(DeleteView):
     success_url = '/news/'
 
 
-
+@login_required
+def upgrade_me(request):
+    user = request.user
+    premium_group = Group.objects.get(name='authors')
+    if not request.user.groups.filter(name='authors').exists():
+        premium_group.user_set.add(user)
+    return redirect('/')
 
