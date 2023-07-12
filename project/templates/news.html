@@ -28,6 +28,10 @@ News
                 <td>
                     <h2>Автор</h2>
                 </td>
+                 <td>
+                    <h2>Категория</h2>
+                </td>
+
 
             </tr>
          {% for new in news %} <!-- поменяем news на filter.qs, т.к. теперь мы забираем уже отобранную по каким-то параметрам информацию -->
@@ -46,6 +50,15 @@ News
                 <td>
                     {{new.authorNew}}
                 </td>
+                <td>
+                    {{new.category}}
+                </td>
+                  <td>
+                        {% for c in new.category.all %}
+                            <a href="{% url 'category' c.id %}">{{c.name}}</a>
+                        {% endfor %}
+                    </td>
+
             </tr>
         {% endfor %}
         </table>

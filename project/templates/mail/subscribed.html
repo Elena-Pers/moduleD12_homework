@@ -1,0 +1,14 @@
+{% extends 'flatpages/default.html' %}
+
+{% load custom_filters %}
+
+{% block title %} Подписка {% endblock title %}
+
+{% block content %}
+
+    <h2>Подписка </h2>
+    <p>
+        <strong>{{ user.username }}</strong>, Вы подписались на категорию"!
+    </p>
+
+{% endblock content %}

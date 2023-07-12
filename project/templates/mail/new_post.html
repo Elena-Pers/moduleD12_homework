@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Новая статья</title>
+</head>
+<!-- Подгружается в NewsPaper\news\tasks\basic.py -->
+<body>
+    <h2>Новый пост в категории</h2>
+    <h3>
+        В рубрике <strong>{{category}}</strong> появился новый пост от <strong>{{news.authorNew}}</strong>
+    </h3>
+    <p>Нажмите на ссылку ниже, чтобы прочитать статью:
+        <a href="http://127.0.0.1:8000{% url 'post_detail' post.id %}"> <h3>{{ news.name }}</h3> </a>
+        {{ news.description|truncatechars:30 }}
+    </p>
+
+
+</body>
+</html>
+
+  - - -

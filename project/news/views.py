@@ -1,7 +1,7 @@
 
  # импортируем класс, который говорит нам о том, что в этом представлении мы будем выводить список объектов из БД
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, View
-from .models import News
+from .models import News, Category
 from datetime import datetime
 from .filters import NewsFilter # импортируем недавно написанный фильтр
 from .forms import NewsForm
@@ -10,8 +10,11 @@ from django.shortcuts import redirect
 from django.contrib.auth.models import Group
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.views.generic.edit import CreateView
-
+from .models import Appointment
+from django.core.mail import send_mail, EmailMultiAlternatives
+from django.urls import reverse_lazy, resolve
+from django.template.loader import render_to_string
+from django.conf import settings
 
 
 class NewsList(ListView):
@@ -98,3 +101,85 @@ def upgrade_me(request):
         premium_group.user_set.add(user)
     return redirect('/')
 
+
+class PostCategoryView(ListView):
+     model = News
+     template_name = 'news_app/category.html'
+     context_object_name = 'news'  # это имя списка, в котором будут лежать все объекты,
+     # его надо указать, чтобы обратиться к самому списку объектов через HTML-шаблон
+     ordering = ['-dateCreation']  # сортировка
+     paginate_by = 10  # поставим постраничный вывод в один элемент
+
+     def get_queryset(self):
+         self.id = resolve(self.request.path_info).kwargs['pk']
+         c = Category.objects.get(id=self.id)
+         queryset = News.objects.filter(category_id=c)
+
+         return queryset
+
+     def get_context_data(self, **kwargs):
+         context = super().get_context_data(**kwargs)
+         user = self.request.user
+         category = Category.objects.get(id=self.id)
+         subscribed = category.subscribers.filter(email=user.email)
+         if not subscribed:
+             context['category'] = category
+         return context
+
+
+@login_required
+def subscribe_to_category(request, pk):  # подписка на категорию
+     user = request.user
+     category = Category.objects.get(id=pk)
+
+     if not category.subscribers.filter(id=user.id).exists():
+         category.subscribers.add(user)
+         email = user.email
+         html = render_to_string(
+             'mail/subscribed.html',
+             {
+                 'category': category,
+                 'user': user,
+             },
+         )
+         msg = EmailMultiAlternatives(
+             subject=f'Подписка на {category} на сайте News Paper',
+             body='',
+             from_email='lena_zaika_nsk@mail.ru',  # в settings.py
+             to=[email, ],  # список получателей
+         )
+         msg.attach_alternative(html, 'text/html')
+
+         try:
+             msg.send()
+         except Exception as e:
+             print(e)
+         return redirect('/news/subscribed/', category=category)
+         # return redirect('news_list')
+     return redirect('/news/subscribed/', { 'category': category })  # возвращает на страницу, с кот-й поступил запрос
+
+
+@login_required
+def unsubscribe_from_category(request, pk):  # отписка от категории
+     user = request.user
+     c = Category.objects.get(id=pk)
+
+     if c.subscribers.filter(id=user.id).exists():  # проверяем есть ли у нас такой подписчик
+         c.subscribers.remove(user)  # то удаляем нашего пользователя
+     # return redirect('http://127.0.0.1:8000/')
+     return redirect('/news/unsubscribed/')
+
+
+class AppointmentView(View):
+     def get(self, request, *args, **kwargs):
+         return render(request, 'news_app/make_app.html', {})
+
+     def post(self, request, *args, **kwargs):
+         appointment = Appointment(
+             date=datetime.strptime(request.POST['date'], '%Y-%m-%d'),
+             client_name=request.POST['client_name'],
+             message=request.POST['message'],
+         )
+         appointment.save()
+
+         return redirect('news:make_app')
