@@ -121,7 +121,18 @@ DATABASES = {
     }
 }
 
-
+'''
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'postgres',
+        'USER': 'postgres',
+        'PASSWORD': 'zaika716',
+        'HOST': 'localhost',
+        'PORT': '5432',
+    },
+}
+'''
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
@@ -180,7 +191,7 @@ ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
-ACCOUNT_EMAIL_VERIFICATION = 'none'
+#ACCOUNT_EMAIL_VERIFICATION = 'none'
 
 ACCOUNT_FORMS = {'signup': 'sign.models.CommonSignupForm'}
 
@@ -206,11 +217,7 @@ DEFAULT_FROM_EMAIL = os.getenv(
 # если вы используете Яндекс, то не забудьте добавить + ‘@yandex.ru’
 
 
-# Для хранящихся паролей в .env:
-# from decouple import config
-# DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')
-# или
-# DEFAULT_FROM_EMAIL = settings.DEFAULT_FROM_EMAIL
+
 
 
 # Модуль 6.5. формат даты, которую будет воспринимать наш задачник(вспоминаем урок по фильтрам)
@@ -229,5 +236,131 @@ CACHES = {
         'LOCATION': os.path.join(BASE_DIR, 'cache_files'),
         # Указываем, куда будем сохранять кэшируемые файлы! Не забываем создать папку cache_files внутри папки с manage.py!
         'TIMEOUT': 10,
+    }
+}
+#логирование
+ADMINS = [
+    ('Elena', EMAIL_HOST_USER)
+]
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+
+    # форматирование
+    'formatters': {
+        'simple': {
+            'format': '[{asctime}] [{levelname}] {message}',
+            'style': '{',
+        },
+        'warning_format': {
+            'format': '[{asctime}] [{levelname}] {message} {pathname}',
+            'style': '{',
+        },
+        'error_format': {
+            'format': '[{asctime}] [{levelname}] {message} {pathname} {exc_info}',
+            'style': '{',
+        },
+        'info_file_format': {
+            'format': '[{asctime}] [{levelname}] {module} {message}',
+            'style': '{',
+        },
+        'error_file_format': {
+            'format': '[{asctime}] * [{levelname}] {message} {pathname} {exc_info}',
+            'style': '{',
+        },
+        'error_mail_format': {
+            'format': '[{asctime}] [{levelname}] {message} {pathname}',
+            'style': '{',
+        },
+    },
+
+    # фильтры
+    'filters': {
+        'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue',
+        },
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse',
+        },
+    },
+
+    # обработчики
+    'handlers': {
+        'console': {
+            'level': 'INFO',
+            'filters': ['require_debug_true'],
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple'
+        },
+        'console_warning': {
+            'level': 'WARNING',
+            'filters': ['require_debug_true'],
+            'class': 'logging.StreamHandler',
+            'formatter': 'warning_format'
+        },
+        'console_error': {
+            'level': 'ERROR',
+            'filters': ['require_debug_true'],
+            'class': 'logging.StreamHandler',
+            'formatter': 'error_format'
+        },
+        'general_log': {
+            'level': 'INFO',
+            'filters': ['require_debug_false'],
+            'class': 'logging.FileHandler',
+            'filename': 'general.log',
+            'formatter': 'info_file_format'
+        },
+        'error_log': {
+            'level': 'ERROR',
+            'class': 'logging.FileHandler',
+            'filename': 'errors.log',
+            'formatter': 'error_file_format'
+        },
+        'security_log': {
+            'class': 'logging.FileHandler',
+            'filename': 'security.log',
+            'formatter': 'info_file_format'
+        },
+        'mail_admins': {
+            'level': 'INFO',
+            'filters': ['require_debug_false'],
+            'class': 'django.utils.log.AdminEmailHandler',
+            'formatter': 'error_mail_format',
+        },
+    },
+
+    # регистраторы
+    'loggers': {
+        'django': {
+            'handlers': ['general_log', 'console_error', 'console_warning',  'console'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'django.request': {
+            'handlers': ['error_log', 'mail_admins'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+        'django.server': {
+            'handlers': ['error_log', 'mail_admins' ],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+        'django.template': {
+            'handlers': ['error_log'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+        'django.db_backends': {
+            'handlers': ['error_log'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+        'django.security': {
+            'handlers': ['security_log'],
+            'propagate': True,
+        },
     }
 }
