@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
+
 from dotenv import load_dotenv
 
 load_dotenv()  # take environment variables from .env.
@@ -284,18 +285,21 @@ LOGGING = {
             'filters': ['require_debug_true'],
             'class': 'logging.StreamHandler',
             'formatter': 'simple'
+
         },
         'console_warning': {
             'level': 'WARNING',
             'filters': ['require_debug_true'],
             'class': 'logging.StreamHandler',
             'formatter': 'warning_format'
+
         },
         'console_error': {
             'level': 'ERROR',
             'filters': ['require_debug_true'],
             'class': 'logging.StreamHandler',
             'formatter': 'error_format'
+
         },
         'general_log': {
             'level': 'INFO',
@@ -304,22 +308,27 @@ LOGGING = {
             'filename': 'general.log',
             'formatter': 'info_file_format'
         },
+
         'error_log': {
             'level': 'ERROR',
             'class': 'logging.FileHandler',
             'filename': 'errors.log',
             'formatter': 'error_file_format'
+
         },
         'security_log': {
             'class': 'logging.FileHandler',
             'filename': 'security.log',
             'formatter': 'info_file_format'
+
         },
+
         'mail_admins': {
             'level': 'INFO',
             'filters': ['require_debug_false'],
             'class': 'django.utils.log.AdminEmailHandler',
-            'formatter': 'error_mail_format',
+            'formatter': 'error_mail_format'
+
         },
     },
 
